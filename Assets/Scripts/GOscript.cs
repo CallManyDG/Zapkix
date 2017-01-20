@@ -9,9 +9,6 @@ public class GOscript : MonoBehaviour {
 	public PlayerScript ps;
 	public bool resetScale;
 
-	void Start(){
-		resetScale = true;
-	}
 
 	void Update(){
 		if((resetScale)) {
@@ -25,8 +22,10 @@ public class GOscript : MonoBehaviour {
 			}
 			resetScale = false;
 		}
+
 		LoadForm ();
 		LoadColor ();
+
 	}
 
 	void LoadColor(){
@@ -52,9 +51,6 @@ public class GOscript : MonoBehaviour {
 			foreach (var sprite in sprites) {
 				if (sprite.name == selectedForm.ToString ()) {
 					image.sprite = (Sprite)sprite;
-					if (this.gameObject.name == "ComputerGO") {
-						Debug.Log (selectedForm);
-					}
 
 				}
 			}

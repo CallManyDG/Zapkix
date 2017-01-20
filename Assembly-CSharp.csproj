@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{B021709B-3E41-A754-BEDE-C45156BE352E}</ProjectGuid>
+    <ProjectGuid>{2E7A5A02-A7C9-6105-546B-E52AF9D4F4C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -51,6 +51,16 @@
      <Compile Include="Assets\Scripts\GOscript.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\GameState.cs" />
+     <Compile Include="Assets\Scripts\LevelSelection\InfoManager.cs" />
+     <Compile Include="Assets\Scripts\LevelSelection\LevelMenuManager.cs" />
+     <Compile Include="Assets\Scripts\LevelSelection\LevelPrefabScript.cs" />
+     <Compile Include="Assets\Scripts\Levels\Level.cs" />
+     <Compile Include="Assets\Scripts\Levels\NormalLevel.cs" />
+     <Compile Include="Assets\Scripts\Levels\NormalLevels\EasyLevelColor.cs" />
+     <Compile Include="Assets\Scripts\Levels\NormalLevels\EasyLevelForms.cs" />
+     <Compile Include="Assets\Scripts\Levels\NormalLevels\HardLevel.cs" />
+     <Compile Include="Assets\Scripts\Levels\NormalLevels\MediumLevel.cs" />
+     <Compile Include="Assets\Scripts\LostManager.cs" />
      <Compile Include="Assets\Scripts\NewBehaviourScript.cs" />
      <Compile Include="Assets\Scripts\PlayerScript.cs" />
      <Compile Include="Assets\Scripts\TextColorAnimation.cs" />

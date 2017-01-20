@@ -6,6 +6,9 @@ public class PlayerScript : MonoBehaviour {
 
 	#region Variables
 	/*-----------GameSpace--------*/
+	public bool isRunning;
+
+
 	public GameObject GameSpace;
 
 	public Colors colors;
@@ -13,7 +16,7 @@ public class PlayerScript : MonoBehaviour {
 	/*--------Player------------*/
 	public GameObject Player;
 	RectTransform PlayerRT;
-	GOscript playerInfo;
+	public GOscript playerInfo;
 
 	/*--------Player values--------*/
 	public int points;
@@ -27,15 +30,17 @@ public class PlayerScript : MonoBehaviour {
 
 	public GameObject Computer;
 	RectTransform ComputerRT;
-	GOscript computerInfo;
+	public GOscript computerInfo;
 	/*-----------Info variables------*/
 	public Text Score;
 	public Text HeighScore;
 
-	/*-----Delegate Game-----*/
-	public delegate void Game();
+	public GameObject lostPanel;
+	public GameObject UIgameElements;
 
-	public Game game;
+	/*-----Delegate Game-----*/
+
+	public Level level;
 
 	#endregion
 
@@ -43,63 +48,63 @@ public class PlayerScript : MonoBehaviour {
 	/*-------------Main functions-----------*/
 	#region Main functions
 
+
 	void Start(){
+		isRunning = false;
+		
 		PlayerRT = Player.GetComponent<RectTransform> ();
 		ComputerRT = Computer.GetComponent<RectTransform> ();
 		playerInfo = Player.GetComponent<GOscript> ();
 		computerInfo = Computer.GetComponent<GOscript> ();
 
-		game ();
-
 		playerScale = PlayerRT.sizeDelta;
 		points = 0;
-		playerSpeed = 10f;
-
-		computerInfo.resetScale = true;
-		playerInfo.resetScale = true;
 	}
 
 
 	void Update(){
-		if (points == 0) {
-			playerSpeed = 10f;
-		}
-		ScaleDownPlayer (playerSpeed, 0.005f);
+		if (isRunning) {
+			if (points == 0) {
+				playerSpeed = level.StartSpeed;
+			}
+			ScaleDownPlayer (playerSpeed, 0.005f);
 
-		if (Input.GetMouseButtonDown (0)) {
-			Vector3 mousePos = Input.mousePosition;
-			RaycastHit2D ray = Physics2D.Raycast (mousePos, Vector3.zero);
-			if (ray.transform != null) {
-				if (ray.collider.gameObject == GameSpace) {
+			if (Input.GetMouseButtonDown (0)) {
+				Vector3 mousePos = Input.mousePosition;
+				RaycastHit2D ray = Physics2D.Raycast (mousePos, Vector3.zero);
+				if (ray.transform != null) {
+					if (ray.collider.gameObject == GameSpace) {
 
-					bool winState = PlayerWins ();
-					if (winState == true) {
-						// Statement for win
-						points++;
-						game ();
-					} else if (PlayerWins () == false) {
-						// Statement for again Level or exit game to Main Menu
-						points = 0;
-						game ();
+						bool winState = PlayerWins ();
+						if (winState == true) {
+							// Statement for win
+							points++;
+							//game ();
+							level.Game ();
+						} else if (PlayerWins () == false) {
+							// Statement for again Level or exit game to Main Menu
+							this.isRunning = false;
+							lostPanel.SetActive(true);
+							UIgameElements.SetActive (false);
+						}
 					}
 				}
-			}
-		} else if (IsPlayerScaleOnZero ()) {
-			if( (playerInfo.selectedColor != computerInfo.selectedColor) || (playerInfo.selectedForm != computerInfo.selectedForm) ){
-				points++;
-				game ();
-			}else {
-				// Statement for again Level or exit game to Main Menu
-				points = 0;
-				game ();
-
+			} else if (IsPlayerScaleOnZero ()) {
+				if ((playerInfo.selectedColor != computerInfo.selectedColor) || (playerInfo.selectedForm != computerInfo.selectedForm)) {
+					level.Game ();
+				} else {
+					// Statement for again Level or exit game to Main Menu
+					this.isRunning = false;
+					lostPanel.SetActive(true);
+					UIgameElements.SetActive (false);
+				}
 			}
 		}
-
 		/*-------updating info-----*/
 		Score.text = points.ToString ();
 
 	}
+	
 
 	#endregion
 
@@ -208,149 +213,13 @@ public class PlayerScript : MonoBehaviour {
 
 	/*----------------GOscript state-----------------*/				
 
-	void ChangeColor(GOscript go, int maxColors){
-		int randomColor = Random.Range (0, maxColors);
-		go.selectedColor = colors.colors [randomColor];
-	}
 
-	void ChangeForm(GOscript go, int maxForms){
-		int randomForm = Random.Range (0, maxForms);
-		go.selectedForm = (Forms)randomForm;
-
-
-	}
 	/*-----------------Game functions----------------*/
 
 
-	void SpeedUpPlayer(){
-		bool canBeSpeededUp = false;
-		int score = points;
-		if (score != 0 && /*score % 2 == 0 && */score % 5 == 0 )
-			canBeSpeededUp = true;
-
-		if (canBeSpeededUp) {
-			playerSpeed += 1f;
-		}
+	public void SpeedUpPlayer(){
+		playerSpeed += level.IncreaseSpeed;
 
 	}
-
-
-	public void RefreshGame(float FormPercent, float ColorPercent, int Forms, int Colors){
-
-		// 
-		int randomPercentageForm = Random.Range (0, 100);
-		int randomPercentageColor = Random.Range (0, 100);
-
-		if (randomPercentageForm < FormPercent) {
-			// same Form for Player as for Computer
-			int randomForm = Random.Range(0, Forms);
-			playerInfo.selectedForm = (Forms)randomForm;
-			computerInfo.selectedForm = (Forms)randomForm;
-		} else {
-			// another Form for Player as for Computer
-			Here:{
-				int randomForm1 = Random.Range (0, Forms);
-				int randomForm2 = Random.Range (0, Forms);
-				if (randomForm2 == randomForm1) {
-					goto Here;
-					Debug.Log ("Here");
-				}
-				else {
-					playerInfo.selectedForm = (Forms)randomForm1;
-					computerInfo.selectedForm = (Forms)randomForm2;
-				}
-			}
-		}
-
-
-		if (randomPercentageColor < ColorPercent) {
-			// same Color for Player as for Computer
-			int randomColor= Random.Range(0, Colors);
-			playerInfo.selectedColor = colors.colors[randomColor];
-			computerInfo.selectedColor = colors.colors[randomColor];
-		} else {
-			// another Color for Player as for Computer
-			Here2:{
-				int randomColor1 = Random.Range (0, Colors);
-				int randomColor2 = Random.Range (0, Colors);
-				if (randomColor2 == randomColor1) {
-					goto Here2;
-					Debug.Log ("Here2");
-				}
-				else {
-					playerInfo.selectedColor = colors.colors [randomColor1];
-					computerInfo.selectedColor = colors.colors [randomColor2];
-				}
-			}
-		}
-			
-		playerInfo.resetScale = true;
-		computerInfo.resetScale = true;
-		SpeedUpPlayer ();
-	}
-
-	public void RefreshGame(bool color, float FormPercent, float ColorPercent){
-		if (color == true) {
-			// Changing only color and select randomly a Form (both Player and Computer)... This Form will be same until the end
-			int randomForm = Random.Range(0,(int)Forms.NumberOfTypes);
-			playerInfo.selectedForm = (Forms)randomForm;
-			computerInfo.selectedForm = (Forms)randomForm;
-
-			int randomPercentageColor = Random.Range (0, 100);
-			if (randomPercentageColor < ColorPercent) {
-				int randomColor= Random.Range(0, colors.colors.Count);
-				playerInfo.selectedColor = colors.colors[randomColor];
-				computerInfo.selectedColor = colors.colors[randomColor];
-			} else {
-				Here3:
-				{
-					int randomColor1 = Random.Range (0, colors.colors.Count);
-					int randomColor2 = Random.Range (0, colors.colors.Count);
-					if (randomColor2 == randomColor1) {
-						goto Here3;
-						Debug.Log ("Here3");
-					} else {
-						
-						playerInfo.selectedColor = colors.colors [randomColor1];
-						computerInfo.selectedColor = colors.colors [randomColor2];
-				
-					}
-				}
-			}
-		} else {
-
-			int randomColor = Random.Range(0,colors.colors.Count);
-			playerInfo.selectedColor = colors.colors[randomColor];
-			computerInfo.selectedColor = colors.colors[randomColor];
-
-			int randomPercentageForm = Random.Range (0, 100);
-
-			if (randomPercentageForm < FormPercent) {
-				// same Form for Player as for Computer
-				int randomForm = Random.Range(0, (int)Forms.NumberOfTypes);
-				playerInfo.selectedForm = (Forms)randomForm;
-				computerInfo.selectedForm = playerInfo.selectedForm;
-			} else {
-				// another Form for Player as for Computer
-				Here4:{
-					int randomForm1 = Random.Range (0, (int)Forms.NumberOfTypes);
-					int randomForm2 = Random.Range (0, (int)Forms.NumberOfTypes);
-					if (randomForm2 == randomForm1) {
-						goto Here4;
-						Debug.Log ("Here4");
-					}
-					else {
-						playerInfo.selectedForm = (Forms)randomForm1;
-						computerInfo.selectedForm = (Forms)randomForm2;
-					}
-				}
-			}
-		}
-
-
-		playerInfo.resetScale = true;
-		computerInfo.resetScale = true;
-		SpeedUpPlayer ();
-	}
-
+		
 }
